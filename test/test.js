@@ -69,7 +69,9 @@ test("validity", function() {
   equal(visa.errors.count(), 0, "error count")
   ok(mc.is_valid(), "mc is valid")
 })
-
+test("minimally valid", function() {
+  ok(visa.is_minimally_valid(), "visa is minimally valid")
+})
 module("invalid instance", {
   setup : function() {
     test_state = new GoldData()
@@ -80,4 +82,16 @@ test("invalid", function() {
   var visa = new CreditCardTrackData(test_state.dummy_visa_tracks)
   ok(!visa.is_valid(), "visa is not valid")
   deepEqual(visa.errors.messages(), { 'first_name' : ['was not found'], 'number' : ['differs between tracks one and two'], 'service_code' : ['differs between tracks one and two'] }, "visa error messages")
+})
+module("minimally valid instance", {
+  setup : function() {
+    test_state = new GoldData()
+    test_state.dummy_visa_tracks = "%B4111111111111111^/^1503110?;4111111111111111=150310199999888?"
+  }
+})
+test("minimally valid", function() {
+  var visa = new CreditCardTrackData(test_state.dummy_visa_tracks)
+  ok(visa.is_minimally_valid(), "visa is minimally valid")
+  ok(!visa.is_valid(), "visa is not valid")
+  deepEqual(visa.errors.messages(), { 'first_name' : ['was not found'], 'last_name' : ['was not found'], 'service_code' : ['differs between tracks one and two'] }, "visa error messages")
 })
