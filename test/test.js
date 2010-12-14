@@ -16,6 +16,8 @@ GoldData.prototype = {
     track2 : "4111111111111111=150310199999888",
     number : "4111111111111111",
     expiration : "1503",
+    month: "03",
+    year: "2015",
     first_name : "FIRST",
     last_name : "LAST",
     service_code : "101",
@@ -27,6 +29,8 @@ GoldData.prototype = {
     track2 : "5555555555554444=14021019999988800000",
     number : "5555555555554444",
     expiration : "1402",
+    month: "02",
+    year: "2014",
     first_name : "FIRST",
     last_name : "LAST",
     service_code : "101",
@@ -53,6 +57,8 @@ test("visa properties", function() {
   equal(visa.track2.raw, test_state.visa.track2, 'visa track2 matches')
   equal(visa.number, test_state.visa.number, 'visa card number matches')
   equal(visa.expiration, test_state.visa.expiration, 'visa expiration matches')
+  equal(visa.month(), test_state.visa.month, 'visa expiration matches')
+  equal(visa.year(), test_state.visa.year, 'visa expiration matches')
   equal(visa.first_name, test_state.visa.first_name, 'visa first_name matches')
   equal(visa.last_name, test_state.visa.last_name, 'visa last_name matches')
 })
@@ -61,6 +67,8 @@ test("mastercard properties", function() {
   equal(mc.track2.raw, test_state.mc.track2, 'mc track2 matches')
   equal(mc.number, test_state.mc.number, 'mc card number matches')
   equal(mc.expiration, test_state.mc.expiration, 'mc expiration matches')
+  equal(mc.month(), test_state.mc.month, 'mc expiration matches')
+  equal(mc.year(), test_state.mc.year, 'mc expiration matches')
   equal(mc.first_name, test_state.mc.first_name, 'mc first_name matches')
   equal(mc.last_name, test_state.mc.last_name, 'mc last_name matches')
 })
@@ -72,6 +80,20 @@ test("validity", function() {
 test("minimally valid", function() {
   ok(visa.is_minimally_valid(), "visa is minimally valid")
 })
+test("unparseable data", function() {
+  raises(function() { new CreditCardTrackData('foo') }, "CCTD:NotACreditCard")
+})
+test("month and year when no expiration", function() {
+//  var cctd = new CreditCardTrackData("%B4111111111111111^LAST/FIRST^1019999900888000000?;4111111111111111=10199999888?")
+//  ok(!cctd.expiration)
+  visa.expiration = null
+  equal(null, visa.month())
+  equal(null, visa.year())
+  visa.expiration = ''
+  equal(null, visa.month())
+  equal(null, visa.year())
+})
+
 module("invalid instance", {
   setup : function() {
     test_state = new GoldData()
@@ -83,6 +105,7 @@ test("invalid", function() {
   ok(!visa.is_valid(), "visa is not valid")
   deepEqual(visa.errors.messages(), { 'first_name' : ['was not found'], 'number' : ['differs between tracks one and two'], 'service_code' : ['differs between tracks one and two'] }, "visa error messages")
 })
+
 module("minimally valid instance", {
   setup : function() {
     test_state = new GoldData()
